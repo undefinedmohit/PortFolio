@@ -18,7 +18,16 @@ export const BackgroundVideo: React.FC = () => {
     const video = videoRef.current;
     if (video) {
       video.muted = true;
-      video.pause();
+      video.playsInline = true;
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            video.pause();
+            video.currentTime = 0.001;
+          })
+          .catch(() => {});
+      }
     }
 
     const isMobile = () => window.innerWidth < 768;
@@ -77,10 +86,12 @@ export const BackgroundVideo: React.FC = () => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('touchmove', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchmove', handleScroll);
     };
   }, []);
 
@@ -97,11 +108,20 @@ export const BackgroundVideo: React.FC = () => {
   };
 
   const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0.001;
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.playsInline = true;
+      video.currentTime = 0.001;
       targetTimeRef.current = 0.001;
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            video.pause();
+          })
+          .catch(() => {});
+      }
     }
   };
 
@@ -116,12 +136,14 @@ export const BackgroundVideo: React.FC = () => {
       onLoadedMetadata={handleLoadedMetadata}
       style={{
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
         zIndex: 0,
-        width: '100%',
-        height: '100%',
         objectFit: 'cover',
         objectPosition: '70% center',
+        pointerEvents: 'none',
       }}
     />
   );
