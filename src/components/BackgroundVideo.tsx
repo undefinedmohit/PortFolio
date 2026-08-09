@@ -18,7 +18,7 @@ export const BackgroundVideo: React.FC = () => {
     const video = videoRef.current;
     if (video) {
       video.muted = true;
-      video.play().catch(() => {});
+      video.pause();
     }
 
     const isMobile = () => window.innerWidth < 768;
@@ -99,9 +99,9 @@ export const BackgroundVideo: React.FC = () => {
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       videoRef.current.muted = true;
+      videoRef.current.pause();
       videoRef.current.currentTime = 0.001;
       targetTimeRef.current = 0.001;
-      videoRef.current.play().catch(() => {});
     }
   };
 
@@ -109,8 +109,6 @@ export const BackgroundVideo: React.FC = () => {
     <video
       ref={videoRef}
       src={getInitialVideoUrl()}
-      autoPlay
-      loop
       muted
       playsInline
       preload="auto"
