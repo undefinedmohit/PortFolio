@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const LOCAL_VIDEO_URL = '/bg-video.mp4';
-const FALLBACK_VIDEO_URL = 'https://drive.google.com/uc?export=download&id=1HX7KaAznpVtYtOGayHhuQxqGZR_-uvHV';
+const getInitialVideoUrl = () => {
+  const base = import.meta.env.BASE_URL || './';
+  const prefix = base.endsWith('/') ? base : `${base}/`;
+  return `${prefix}bg-video.mp4`;
+};
+
+const FALLBACK_VIDEO_URL =
+  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4';
 const SENSITIVITY = 0.8;
 
 export const BackgroundVideo: React.FC = () => {
@@ -9,7 +15,7 @@ export const BackgroundVideo: React.FC = () => {
   const targetTimeRef = useRef<number>(0);
   const isSeekingRef = useRef<boolean>(false);
   const prevXRef = useRef<number | null>(null);
-  const [videoSrc, setVideoSrc] = useState<string>(LOCAL_VIDEO_URL);
+  const [videoSrc, setVideoSrc] = useState<string>(getInitialVideoUrl);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -58,14 +64,15 @@ export const BackgroundVideo: React.FC = () => {
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      targetTimeRef.current = 0;
+      // Force initial frame render
+      videoRef.current.currentTime = 0.001;
+      targetTimeRef.current = 0.001;
     }
   };
 
   const handleError = () => {
     if (videoSrc !== FALLBACK_VIDEO_URL) {
-      console.warn('Local background video failed to load, falling back to Google Drive stream URL');
+      console.warn('Local background video failed to load, switching to CloudFront fallback URL');
       setVideoSrc(FALLBACK_VIDEO_URL);
     }
   };
