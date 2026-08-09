@@ -21,7 +21,12 @@ export const BackgroundVideo: React.FC = () => {
       video.play().catch(() => {});
     }
 
+    const isMobile = () => window.innerWidth < 768;
+
+    // Desktop: horizontal mouse movement scrub
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMobile()) return;
+
       const v = videoRef.current;
       if (!v) return;
 
@@ -47,9 +52,35 @@ export const BackgroundVideo: React.FC = () => {
       }
     };
 
+    // Mobile: vertical scroll position scrub
+    const handleScroll = () => {
+      if (!isMobile()) return;
+
+      const v = videoRef.current;
+      if (!v) return;
+
+      const duration = v.duration;
+      if (!duration || isNaN(duration)) return;
+
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll <= 0) return;
+
+      const scrollProgress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
+      const newTarget = scrollProgress * duration;
+      targetTimeRef.current = newTarget;
+
+      if (!isSeekingRef.current) {
+        isSeekingRef.current = true;
+        v.currentTime = newTarget;
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
