@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const getInitialVideoUrl = () => {
   const base = import.meta.env.BASE_URL || './';
@@ -6,8 +6,6 @@ const getInitialVideoUrl = () => {
   return `${prefix}bg-video.mp4`;
 };
 
-const FALLBACK_VIDEO_URL =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4';
 const SENSITIVITY = 0.8;
 
 export const BackgroundVideo: React.FC = () => {
@@ -15,12 +13,17 @@ export const BackgroundVideo: React.FC = () => {
   const targetTimeRef = useRef<number>(0);
   const isSeekingRef = useRef<boolean>(false);
   const prevXRef = useRef<number | null>(null);
-  const [videoSrc, setVideoSrc] = useState<string>(getInitialVideoUrl);
 
   useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {});
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
-      const video = videoRef.current;
-      if (!video) return;
+      const v = videoRef.current;
+      if (!v) return;
 
       const currentX = e.clientX;
       if (prevXRef.current === null) {
@@ -31,7 +34,7 @@ export const BackgroundVideo: React.FC = () => {
       const delta = currentX - prevXRef.current;
       prevXRef.current = currentX;
 
-      const duration = video.duration;
+      const duration = v.duration;
       if (!duration || isNaN(duration)) return;
 
       const timeOffset = (delta / window.innerWidth) * SENSITIVITY * duration;
@@ -40,7 +43,7 @@ export const BackgroundVideo: React.FC = () => {
 
       if (!isSeekingRef.current) {
         isSeekingRef.current = true;
-        video.currentTime = newTarget;
+        v.currentTime = newTarget;
       }
     };
 
@@ -64,29 +67,24 @@ export const BackgroundVideo: React.FC = () => {
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      // Force initial frame render
+      videoRef.current.muted = true;
       videoRef.current.currentTime = 0.001;
       targetTimeRef.current = 0.001;
-    }
-  };
-
-  const handleError = () => {
-    if (videoSrc !== FALLBACK_VIDEO_URL) {
-      console.warn('Local background video failed to load, switching to CloudFront fallback URL');
-      setVideoSrc(FALLBACK_VIDEO_URL);
+      videoRef.current.play().catch(() => {});
     }
   };
 
   return (
     <video
       ref={videoRef}
-      src={videoSrc}
+      src={getInitialVideoUrl()}
+      autoPlay
+      loop
       muted
       playsInline
       preload="auto"
       onSeeked={handleSeeked}
       onLoadedMetadata={handleLoadedMetadata}
-      onError={handleError}
       style={{
         position: 'fixed',
         inset: 0,
