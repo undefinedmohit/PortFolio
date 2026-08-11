@@ -9,21 +9,61 @@
 
 body {
   font-family: var(--font-body);
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+  background-color: #0d1117;
+  color: #111827;
 }
 
-/* Keyframe for typewriter blinking cursor */
-@keyframes blink {
+/* Custom scrollbar for modern feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* Custom floating animations for skill badges */
+@keyframes floatSlow {
   0%, 100% {
-    opacity: 1;
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    opacity: 0;
+    transform: translateY(-10px) rotate(1.5deg);
   }
 }
 
-.animate-blink {
-  animation: blink 1s step-end infinite;
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(12px) rotate(-1.5deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: floatReverse 8s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
 }

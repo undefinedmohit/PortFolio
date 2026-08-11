@@ -1,5 +1,6 @@
 import React from 'react';
 import { BackgroundVideo } from './components/BackgroundVideo';
+import { BackgroundSkillLogos } from './components/BackgroundSkillLogos';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { ExperienceSection } from './components/ExperienceSection';
@@ -13,6 +14,9 @@ export const App: React.FC = () => {
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white/20 select-none">
       {/* Mouse-scrub controlled background video */}
       <BackgroundVideo />
+
+      {/* Ambient background skill logos layer */}
+      <BackgroundSkillLogos />
 
       {/* Header Navbar */}
       <Navbar />
